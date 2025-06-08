@@ -1,0 +1,83 @@
+{
+	"name": "rtva-tools",
+	"displayName": "RTVA Tools",
+	"description": "Build tools for Real-Time Value Added Projects",
+	"version": "1.0.3",
+	"publisher": "Bailin",
+	"private": true,
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/kindle/rtva-tools.git"
+	},
+	"engines": {
+		"vscode": "^1.73.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"icon": "media/rtva.png",
+	"activationEvents": [
+		"onCommand:workbench.action.tasks.runTask"
+	],
+	"main": "./out/extension",
+	"contributes": {
+		"menus": {
+			"view/title": [
+				{
+					"command": "rtva.build",
+					"when": "view == rtvaView",
+					"group": "navigation"
+				},
+				{
+					"command": "rtva.gear",
+					"when": "view == rtvaView",
+					"group": "navigation"
+				}
+			]
+		},
+		"commands": [
+			{
+				"command": "rtva.build",
+				"title": "Build project",
+				"icon": "$(play)"
+			},
+			{
+				"command": "rtva.gear",
+				"title": "Open 'tasks.json'",
+				"icon": "$(settings-gear)"
+			}
+		],
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "rtva",
+					"title": "RTVA",
+					"icon": "media/rtva.svg" 
+				}
+			]
+		},
+		"views": {
+			"rtva": [
+				{
+					"id": "rtvaView",
+					"name": "RTVA Build Tools"
+				}
+			]
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -b",
+		"watch": "tsc -b -w"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.13.0",
+		"@stylistic/eslint-plugin": "^2.9.0",
+		"@types/node": "^20",
+		"@types/vscode": "^1.73.0",
+		"eslint": "^9.13.0",
+		"typescript": "^5.8.2",
+		"typescript-eslint": "^8.26.0"
+	}
+}
