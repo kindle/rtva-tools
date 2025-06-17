@@ -2,7 +2,7 @@
 	"name": "rtva-tools",
 	"displayName": "RTVA Tools",
 	"description": "Build tools for Real-Time Value Added Projects",
-	"version": "1.0.3",
+	"version": "1.0.5",
 	"publisher": "Bailin",
 	"private": true,
 	"license": "MIT",
@@ -25,12 +25,12 @@
 		"menus": {
 			"view/title": [
 				{
-					"command": "rtva.build",
-					"when": "view == rtvaView",
+					"command": "rtva.reload",
+					"when": "view == rtvaView1",
 					"group": "navigation"
 				},
 				{
-					"command": "rtva.gear",
+					"command": "rtva.config",
 					"when": "view == rtvaView",
 					"group": "navigation"
 				}
@@ -38,13 +38,13 @@
 		},
 		"commands": [
 			{
-				"command": "rtva.build",
-				"title": "Build project",
-				"icon": "$(play)"
+				"command": "rtva.reload",
+				"title": "Reload 'mytasks.json'",
+				"icon": "$(refresh)"
 			},
 			{
-				"command": "rtva.gear",
-				"title": "Open 'tasks.json'",
+				"command": "rtva.config",
+				"title": "Open 'mytasks.json'",
 				"icon": "$(settings-gear)"
 			}
 		],
@@ -53,7 +53,7 @@
 				{
 					"id": "rtva",
 					"title": "RTVA",
-					"icon": "media/rtva.svg" 
+					"icon": "media/rtva.svg"
 				}
 			]
 		},
@@ -61,7 +61,8 @@
 			"rtva": [
 				{
 					"id": "rtvaView",
-					"name": "RTVA Build Tools"
+					"name": "Tasks",
+					"icon": ""
 				}
 			]
 		}
@@ -79,5 +80,8 @@
 		"eslint": "^9.13.0",
 		"typescript": "^5.8.2",
 		"typescript-eslint": "^8.26.0"
+	},
+	"dependencies": {
+		"ansi-to-html": "^0.7.2"
 	}
 }

@@ -6,12 +6,12 @@ This project is a Visual Studio Code extension that provides a custom task provi
 
 - Custom task provider implementation
 - Integration with the VS Code task system
-- ci-build.sh tasks that can be executed
+- ci-build.sh tasks and custom tasks can be executed
 
 ## Usage
 
 1. Remote connect your dev server and open the extension on left sidebar.
-2. Click the gear button and update the ci-build.sh path you want to execute.
+2. Click the gear button and update the task path you want to execute.
 3. Click build button to start.
 
 ## License
