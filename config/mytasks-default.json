@@ -1,0 +1,41 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build in webview",
+      "icon":"beaker",
+      "type": "shell",
+      "command": "/data/vaa/vaa-tweb-us-jgb/vaa/BondAnalytics/ci/build.sh -d",
+      "asci": false,
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }  
+    },
+    {
+      "label": "crashdumps",
+      "icon":"debug",
+      "type": "shell",
+      "command": "/data/bailin_test/check_crashdumps.sh",
+      "asci": true,
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }  
+    },
+    {
+      "label": "ADS connection",
+      "icon":"rss",
+      "type": "shell",
+      "command": "check_crashdumps.sh",
+      "asci": true,
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }  
+    }
+  ] 
+}

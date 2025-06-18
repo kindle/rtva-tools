@@ -6,6 +6,7 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as cp from 'child_process';
+import AnsiToHtml from 'ansi-to-html';
 //if vscode is not found, try:
 //npm install --save-dev vscode @types/vscode
 //but ususally company laptop can not do this.
@@ -41,32 +42,53 @@ export function activate(_context: vscode.ExtensionContext): void {
     vscode.window.createTreeView('rtvaView', { treeDataProvider });
 
     log('register commands...');
-    /*
+    
     // register build button to reload mytasks.json to side bar
     _context.subscriptions.push(
-        vscode.commands.registerCommand('rtva.reload', async () => {
+        vscode.commands.registerCommand('rtva.build', async () => {
             try {
-                //await vscode.commands.executeCommand('workbench.action.tasks.build');
-                //reload mytasks.json to side bar
-                vscode.window.showInformationMessage('reloading mytasks.json...');
-                treeDataProvider.refresh(); // Reload tasks
+                await vscode.commands.executeCommand('workbench.action.tasks.build');
             } catch (err) {
-                vscode.window.showWarningMessage('Failed to reload mytasks.json: ' + err);
+                vscode.window.showWarningMessage('Failed to build: ' + err);
             }
         })
     );
-    */
 
     // register settings button to open mytasks.json
 	_context.subscriptions.push(
         vscode.commands.registerCommand('rtva.config', async () => {
             const folders = vscode.workspace.workspaceFolders;
-            if (folders && folders.length > 0) {
-                const tasksJson = vscode.Uri.joinPath(folders[0].uri, '.vscode', 'mytasks.json');
-                await vscode.commands.executeCommand('vscode.open', tasksJson);
-            } else {
+            if (!folders || folders.length === 0) {
                 vscode.window.showWarningMessage('No workspace folder found.');
+                return;
             }
+            const workspaceRoot = folders[0].uri.fsPath;
+            const tasksJsonPath = path.join(workspaceRoot, '.vscode', 'mytasks.json');
+            const defaultTasksPath = _context.asAbsolutePath('config/mytasks-default.json');
+
+            if (!fs.existsSync(tasksJsonPath)) {
+                const answer = await vscode.window.showInformationMessage(
+                    "'mytasks.json' does not exist. Load default 'mytasks.json'?",
+                    'Yes', 'No'
+                );
+                if (answer === 'Yes') {
+                    try {
+                        if (!fs.existsSync(path.join(workspaceRoot, '.vscode'))) {
+                            fs.mkdirSync(path.join(workspaceRoot, '.vscode'));
+                        }
+                        const defaultContent = fs.readFileSync(defaultTasksPath, 'utf8');
+                        fs.writeFileSync(tasksJsonPath, defaultContent, 'utf8');
+                        vscode.window.showInformationMessage('Default mytasks.json loaded.');
+                    } catch (err) {
+                        vscode.window.showErrorMessage('Failed to load default mytasks.json: ' + err);
+                        return;
+                    }
+                } else {
+                    return;
+                }
+            }
+            const tasksJsonUri = vscode.Uri.file(tasksJsonPath);
+            await vscode.commands.executeCommand('vscode.open', tasksJsonUri);
         })
     );
 
@@ -82,16 +104,106 @@ export function activate(_context: vscode.ExtensionContext): void {
                 const tasks = json.tasks || [];
                 const task = tasks[idx];
                 if (!task) {return;}
-                cp.exec(task.command, (error, stdout, stderr) => {
-                    const output = error ? (stderr || error.message) : stdout;
-                    const panel = vscode.window.createWebviewPanel(
-                        'rtvaCheckOutput',
-                        task.label,
-                        vscode.ViewColumn.Active,
-                        {}
-                    );
+                const panel = vscode.window.createWebviewPanel(
+                    'rtvaCheckOutput',
+                    task.label,
+                    vscode.ViewColumn.Active,
+                    { enableScripts: true }
+                );
+
+                // Initial HTML with a script to receive messages
+                if (task.asci===true){
+                    panel.webview.html = `
+                        <html style="height:100%">
+                        <body style="height:100%">
+                            <pre id="output" style="height: 100%;overflow-y:auto;"></pre>
+                            <script>
+                                const vscode = acquireVsCodeApi();
+                                window.addEventListener('message', event => {
+                                    const msg = event.data;
+                                    if (msg.append) {
+                                        document.getElementById('output').innerHTML += msg.append;
+                                        document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight;
+                                    }
+                                    if (msg.done) {
+                                        document.getElementById('output').innerHTML += "\\n[Process finished]";
+                                        document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight;
+                                    }
+                                });
+                            </script>
+                        </body>
+                        </html>
+                    `;
+                }
+                else{
+                    panel.webview.html = `
+                        <html style="height:100%">
+                        <body style="height:100%">
+                            <pre id="output" style="height: 100%;overflow-y:auto;"></pre>
+                            <script>
+                                const vscode = acquireVsCodeApi();
+                                window.addEventListener('message', event => {
+                                    const msg = event.data;
+                                    if (msg.append) {
+                                        document.getElementById('output').textContent += msg.append;
+                                        document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight;
+                                    }
+                                    if (msg.done) {
+                                        document.getElementById('output').textContent += "\\n[Process finished]";
+                                        document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight;
+                                    }
+                                });
+                            </script>
+                        </body>
+                        </html>
+                    `;
+                }
+                panel.webview.html = `
+                    <html style="height:100%">
+                    <body style="height:100%">
+                        <pre id="output" style="height: 100%;overflow-y:auto;"></pre>
+                        <script>
+                            const vscode = acquireVsCodeApi();
+                            window.addEventListener('message', event => {
+                                const msg = event.data;
+                                if (msg.append) {
+                                    document.getElementById('output').innerHTML += msg.append;
+                                    document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight;
+                                }
+                                if (msg.done) {
+                                    document.getElementById('output').innerHTML += "\\n[Process finished]";
+                                    document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight;
+                                }
+                            });
+                        </script>
+                    </body>
+                    </html>
+                `;
+
+                // Spawn the process
+                const proc = cp.spawn(task.command, { shell: true });
+
+                proc.stdout.on('data', (data) => {
+                    if (task.asci===true){
+                        const ansiConvert = new AnsiToHtml();
+                        const html = ansiConvert.toHtml(data.toString());
+                        panel.webview.postMessage({ append: html });
+                    }else{
+                        panel.webview.postMessage({ append: data.toString() });
+                    }
                     
-                    panel.webview.html = `<pre>${output}</pre>`;
+                });
+                proc.stderr.on('data', (data) => {
+                    if (task.asci===true){
+                        const ansiConvert = new AnsiToHtml();
+                        const html = ansiConvert.toHtml(data.toString());
+                        panel.webview.postMessage({ append: html });
+                    }else{
+                        panel.webview.postMessage({ append: data.toString() });
+                    }
+                });
+                proc.on('close', () => {
+                    panel.webview.postMessage({ done: true });
                 });
             } catch (err) {
                 vscode.window.showWarningMessage('Run task failed: ' + err);

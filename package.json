@@ -1,11 +1,19 @@
 {
 	"name": "rtva-tools",
-	"displayName": "RTVA Tools",
-	"description": "Build tools for Real-Time Value Added Projects",
-	"version": "1.0.5",
+	"displayName": "RTVA Task Manager",
+	"description": "Task Manager for Real-Time Value Added",
+	"version": "1.0.10",
 	"publisher": "Bailin",
 	"private": true,
 	"license": "MIT",
+	"files": [
+		"config/mytasks-default.json",
+		"out",
+		"media",
+		"package.json",
+		"README.md",
+		"CHANGELOG.md"
+	],
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/kindle/rtva-tools.git"
@@ -25,8 +33,8 @@
 		"menus": {
 			"view/title": [
 				{
-					"command": "rtva.reload",
-					"when": "view == rtvaView1",
+					"command": "rtva.build",
+					"when": "view == rtvaView",
 					"group": "navigation"
 				},
 				{
@@ -38,9 +46,9 @@
 		},
 		"commands": [
 			{
-				"command": "rtva.reload",
-				"title": "Reload 'mytasks.json'",
-				"icon": "$(refresh)"
+				"command": "rtva.build",
+				"title": "Run 'tasks.json'",
+				"icon": "$(debug-line-by-line)"
 			},
 			{
 				"command": "rtva.config",

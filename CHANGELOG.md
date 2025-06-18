@@ -2,11 +2,16 @@
 
 The notes below have been kept for historical purposes.
 
-## [1.0.5] - 2025-06-18
+## [1.0.10] - 2025-06-18
 
 ### Added
 
 - refactor code be able to load and run tasks from mytasks.json
+- add sample mytasks.json
+- update the Webview output periodically while a long-running script
+- always scroll to the bottom of the output in the webview
+- convert ANSI color codes to HTML to display colored output in a VS Code webview
+- add build task back
 
 ## [1.0.3] - 2025-06-09
 
