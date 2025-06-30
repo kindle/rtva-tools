@@ -2,6 +2,27 @@
 
 The notes below have been kept for historical purposes.
 
+## [1.0.15] - 2025-06-30
+
+### Fixed
+
+- add check vaa/vah error scripts/icons
+- add ask to confirm option when executing a task
+
+## [1.0.13] - 2025-06-25
+
+### Fixed
+
+- add debug vae0 scripts
+
+## [1.0.12] - 2025-06-24
+
+### Fixed
+
+- add default check_ads.sh and check_crashdumps.sh
+- add check_rdh.sh and check_tdh.sh
+- update mytasks-default.json
+
 ## [1.0.10] - 2025-06-18
 
 ### Added

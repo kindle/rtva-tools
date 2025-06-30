@@ -7,6 +7,7 @@
       "type": "shell",
       "command": "/data/vaa/vaa-tweb-us-jgb/vaa/BondAnalytics/ci/build.sh -d",
       "asci": false,
+      "confirm": true,
       "problemMatcher": [],
       "group": {
         "kind": "build",
@@ -17,8 +18,35 @@
       "label": "crashdumps",
       "icon":"debug",
       "type": "shell",
-      "command": "/data/bailin_test/check_crashdumps.sh",
+      "command": "/data/VAH/.vscode/check_crashdumps.sh",
       "asci": true,
+      "confirm": false,
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }  
+    },
+    {
+      "label": "VAH Errors",
+      "icon":"bracket-error",
+      "type": "shell",
+      "command": "/data/VAH/.vscode/check_vah_err.sh",
+      "asci": true,
+      "confirm": false,
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }  
+    },
+    {
+      "label": "VAA Errors",
+      "icon":"copilot-not-connected",
+      "type": "shell",
+      "command": "/data/VAH/.vscode/check_vaa_err.sh",
+      "asci": true,
+      "confirm": false,
       "problemMatcher": [],
       "group": {
         "kind": "build",
@@ -29,8 +57,48 @@
       "label": "ADS connection",
       "icon":"rss",
       "type": "shell",
-      "command": "check_crashdumps.sh",
+      "command": "/data/VAH/.vscode/check_ads.sh",
       "asci": true,
+      "confirm": false,
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }  
+    },
+    {
+      "label": "RDH connection",
+      "icon":"database",
+      "type": "shell",
+      "command": "/data/VAH/.vscode/check_rdh.sh",
+      "asci": true,
+      "confirm": false,
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }  
+    },
+    {
+      "label": "TDH connection",
+      "icon":"cloud-download",
+      "type": "shell",
+      "command": "/data/VAH/.vscode/check_tdh.sh",
+      "asci": true,
+      "confirm": false,
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }  
+    },
+    {
+      "label": "Debug VAE0",
+      "icon":"debug-console",
+      "type": "shell",
+      "command": "/data/VAH/.vscode/debug_vae0.sh",
+      "asci": true,
+      "confirm": true,
       "problemMatcher": [],
       "group": {
         "kind": "build",

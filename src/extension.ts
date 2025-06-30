@@ -63,8 +63,18 @@ export function activate(_context: vscode.ExtensionContext): void {
                 return;
             }
             const workspaceRoot = folders[0].uri.fsPath;
-            const tasksJsonPath = path.join(workspaceRoot, '.vscode', 'mytasks.json');
+            const vscodeDir = path.join(workspaceRoot, '.vscode');
+            const tasksJsonPath = path.join(vscodeDir, 'mytasks.json');
+
+            // Paths to source files
             const defaultTasksPath = _context.asAbsolutePath('config/mytasks-default.json');
+            const checkAdsPath = _context.asAbsolutePath('config/check_ads.sh');
+            const checkRdhPath = _context.asAbsolutePath('config/check_rdh.sh');
+            const checkTdhPath = _context.asAbsolutePath('config/check_tdh.sh');
+            const debugVae0Path = _context.asAbsolutePath('config/debug_vae0.sh');
+            const checkVaaErrPath = _context.asAbsolutePath('config/check_vaa_err.sh');
+            const checkVahErrPath = _context.asAbsolutePath('config/check_vah_err.sh');
+            const checkCrashPath = _context.asAbsolutePath('config/check_crashdumps.sh');
 
             if (!fs.existsSync(tasksJsonPath)) {
                 const answer = await vscode.window.showInformationMessage(
@@ -73,14 +83,40 @@ export function activate(_context: vscode.ExtensionContext): void {
                 );
                 if (answer === 'Yes') {
                     try {
-                        if (!fs.existsSync(path.join(workspaceRoot, '.vscode'))) {
-                            fs.mkdirSync(path.join(workspaceRoot, '.vscode'));
+                        // Create .vscode directory if it doesn't exist
+                        if (!fs.existsSync(vscodeDir)) {
+                            fs.mkdirSync(vscodeDir);
                         }
+                        
+                        // Copy mytasks-default.json to .vscode/mytasks.json
                         const defaultContent = fs.readFileSync(defaultTasksPath, 'utf8');
                         fs.writeFileSync(tasksJsonPath, defaultContent, 'utf8');
-                        vscode.window.showInformationMessage('Default mytasks.json loaded.');
+                        
+                        // Copy the shell scripts
+                        fs.copyFileSync(checkAdsPath, path.join(vscodeDir, 'check_ads.sh'));
+                        fs.copyFileSync(checkRdhPath, path.join(vscodeDir, 'check_rdh.sh'));
+                        fs.copyFileSync(checkTdhPath, path.join(vscodeDir, 'check_tdh.sh'));
+                        fs.copyFileSync(debugVae0Path, path.join(vscodeDir, 'debug_vae0.sh'));
+                        fs.copyFileSync(checkVaaErrPath, path.join(vscodeDir, 'check_vaa_err.sh'));
+                        fs.copyFileSync(checkVahErrPath, path.join(vscodeDir, 'check_vah_err.sh'));
+                        fs.copyFileSync(checkCrashPath, path.join(vscodeDir, 'check_crashdumps.sh'));
+                        
+                        // Make scripts executable
+                        try {
+                            fs.chmodSync(path.join(vscodeDir, 'check_ads.sh'), '755');
+                            fs.chmodSync(path.join(vscodeDir, 'check_rdh.sh'), '755');
+                            fs.chmodSync(path.join(vscodeDir, 'check_tdh.sh'), '755');
+                            fs.chmodSync(path.join(vscodeDir, 'debug_vae0.sh'), '755');
+                            fs.chmodSync(path.join(vscodeDir, 'check_vaa_err.sh'), '755');
+                            fs.chmodSync(path.join(vscodeDir, 'check_vah_err.sh'), '755');
+                            fs.chmodSync(path.join(vscodeDir, 'check_crashdumps.sh'), '755');
+                        } catch (err) {
+                            console.log('Could not set execute permissions on scripts:', err);
+                        }
+                        
+                        vscode.window.showInformationMessage('Default configuration files copied.');
                     } catch (err) {
-                        vscode.window.showErrorMessage('Failed to load default mytasks.json: ' + err);
+                        vscode.window.showErrorMessage('Failed to copy configuration files: ' + err);
                         return;
                     }
                 } else {
@@ -94,7 +130,7 @@ export function activate(_context: vscode.ExtensionContext): void {
 
     // register run task command
     _context.subscriptions.push(
-        vscode.commands.registerCommand('rtva.runTask', (idx: number) => {
+        vscode.commands.registerCommand('rtva.runTask', async (idx: number) => {
             const folders = vscode.workspace.workspaceFolders;
             if (!folders || folders.length === 0) {return;}
             const mytasksPath = path.join(folders[0].uri.fsPath, '.vscode', 'mytasks.json');
@@ -104,6 +140,19 @@ export function activate(_context: vscode.ExtensionContext): void {
                 const tasks = json.tasks || [];
                 const task = tasks[idx];
                 if (!task) {return;}
+
+                // Check if confirmation is required
+                if (task.confirm === true) {
+                    const answer = await vscode.window.showInformationMessage(
+                        `Run task "${task.label}"?`,
+                        'Yes', 'No'
+                    );
+                    
+                    if (answer !== 'Yes') {
+                        return; // User cancelled
+                    }
+                }
+                
                 const panel = vscode.window.createWebviewPanel(
                     'rtvaCheckOutput',
                     task.label,
